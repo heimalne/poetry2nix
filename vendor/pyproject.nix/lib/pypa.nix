@@ -365,6 +365,8 @@ lib.fix (self: {
             
             || file.filename == "scikit_image-0.22.0-cp39-cp39-macosx_12_0_arm64.whl"
             || file.filename == "scikit_learn-1.4.2-cp39-cp39-macosx_12_0_arm64.whl"
+            # dbbsim 20.0.1 has darwin 11 builds
+            || file.filename == "dbbsim-18.0.3-cp39-cp39-macosx_14_0_arm64.whl"
             || file.filename == "dsd_ctms_oper_res_speed_profiles-7.2.0-cp39-cp39-macosx_13_0_arm64.whl"
             || (lib.any (self.isPlatformTagCompatible platform python.stdenv.cc.libc) file.platformTags);
           in
