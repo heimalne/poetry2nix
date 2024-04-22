@@ -27,10 +27,16 @@ let
   inherit (pyproject-nix.lib) pypa;
 
   selectWheel = files: lib.take 1 (let
+    # wheelFiles = [ {file = "llvmlite-0.42.0-cp39-cp39-macosx_11_0_arm64.whl"; hash = "sha256:d0936c2067a67fb8816c908d5457d63eba3e2b17e515c5fe00e5ee2bace06040";}]; 
     wheelFiles = builtins.filter (fileEntry: pypa.isWheelFileName fileEntry.file) files;
+    # wheelFiles = lib.debug.traceValSeq (builtins.filter (fileEntry: pypa.isWheelFileName fileEntry.file) files);
     # Group wheel files by their file name
-    wheelFilesByFileName = lib.listToAttrs (map (fileEntry: lib.nameValuePair fileEntry.file fileEntry) wheelFiles);
+    # wheelFilesByFileName = lib.listToAttrs (map (fileEntry: lib.nameValuePair fileEntry.file fileEntry) wheelFiles);
+    # wheelFilesByFileName = lib.debug.traceValSeq (lib.listToAttrs (map (fileEntry: lib.nameValuePair fileEntry.file fileEntry) wheelFiles));
+    wheelFilesByFileName = lib.debug.traceValSeq( lib.listToAttrs (lib.debug.traceValSeq (map (fileEntry: lib.nameValuePair fileEntry.file fileEntry) wheelFiles)));
     selectedWheels = pypa.selectWheels python.stdenv.targetPlatform python (map (fileEntry: pypa.parseWheelFileName fileEntry.file) wheelFiles);
+    # selectedWheels = pypa.selectWheels (lib.debug.traceValSeq  python.stdenv.targetPlatform) python (map (fileEntry: pypa.parseWheelFileName fileEntry.file) wheelFiles);
+    # selectedWheels = pypa.selectWheels python.stdenv.targetPlatform python (lib.debug.traceValSeq (map (fileEntry: pypa.parseWheelFileName fileEntry.file) wheelFiles));
   in map (wheel: wheelFilesByFileName.${wheel.filename}) selectedWheels);
 
 in

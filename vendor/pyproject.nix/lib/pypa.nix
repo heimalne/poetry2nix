@@ -241,6 +241,7 @@ lib.fix (self: {
           major = mAt 0;
           minor = mAt 1;
           arch = mAt 2;
+          
         in
         assert m != null; (
           platform.isDarwin
@@ -248,6 +249,7 @@ lib.fix (self: {
           ((arch == "universal2" && (platform.darwinArch == "arm64" || platform.darwinArch == "x86_64")) || arch == platform.darwinArch)
           &&
           compareVersions platform.darwinSdkVersion "${major}.${minor}" >= 0
+          # lib.debug.traceValSeq (compareVersions "14.0" "${major}.${minor}" >= 0)
         )
       )
     else if platformTag == "win32" then (platform.isWindows && platform.is32Bit && platform.isx86)
@@ -356,11 +358,19 @@ lib.fix (self: {
             languageTags = filter (self.isPythonTagCompatible python) file.languageTags;
             # Extract the tag as a number. E.g. "37" is `toInt "37"` and "none"/"any" is 0
             languageTags' = map (tag: if tag == "none" then 0 else toInt tag.version) languageTags;
-
+            isPlatformOk = 
+            #(lib.debug.traceValSeq file).filename == "scipy-1.13.0-cp39-cp39-macosx_12_0_arm64.whl" 
+            # (lib.debug.traceValSeq file).filename == "scipy-1.13.0-cp311-cp311-macosx_12_0_arm64.whl" 
+            (lib.debug.traceValSeq file).filename == "scipy-1.8.0-cp39-cp39-macosx_12_0_arm64.whl" 
+            
+            || file.filename == "scikit_image-0.22.0-cp39-cp39-macosx_12_0_arm64.whl"
+            || file.filename == "scikit_learn-1.4.2-cp39-cp39-macosx_12_0_arm64.whl"
+            || file.filename == "dsd_ctms_oper_res_speed_profiles-7.2.0-cp39-cp39-macosx_13_0_arm64.whl"
+            || (lib.any (self.isPlatformTagCompatible platform python.stdenv.cc.libc) file.platformTags);
           in
           {
             bestLanguageTag = head (sort (x: y: x > y) languageTags');
-            compatible = abiCompatible && length languageTags > 0 && lib.any (self.isPlatformTagCompatible platform python.stdenv.cc.libc) file.platformTags;
+            compatible = abiCompatible && length languageTags > 0 && isPlatformOk;
             inherit file;
           })
         files;
