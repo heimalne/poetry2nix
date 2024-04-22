@@ -359,16 +359,24 @@ lib.fix (self: {
             # Extract the tag as a number. E.g. "37" is `toInt "37"` and "none"/"any" is 0
             languageTags' = map (tag: if tag == "none" then 0 else toInt tag.version) languageTags;
             isPlatformOk = 
+            # this is wrongly selected by poetry (maybe bad metadata in the wheel?)
+             file.filename != "tensorflow_macos-2.9.0-cp38-cp38-macosx_11_0_arm64.whl"
+             &&
             #(lib.debug.traceValSeq file).filename == "scipy-1.13.0-cp39-cp39-macosx_12_0_arm64.whl" 
             # (lib.debug.traceValSeq file).filename == "scipy-1.13.0-cp311-cp311-macosx_12_0_arm64.whl" 
-            (lib.debug.traceValSeq file).filename == "scipy-1.8.0-cp39-cp39-macosx_12_0_arm64.whl" 
+            lib.debug.traceValSeqFn (isOk: "seelectWheels ${file.filename} platform ok? ${builtins.toString isOk}, abi ok? ${builtins.toString abiCompatible} tags: ${builtins.toString file.platformTags}") (
+              file.filename == "scipy-1.8.0-cp39-cp39-macosx_12_0_arm64.whl" 
             
             || file.filename == "scikit_image-0.22.0-cp39-cp39-macosx_12_0_arm64.whl"
             || file.filename == "scikit_learn-1.4.2-cp39-cp39-macosx_12_0_arm64.whl"
             # dbbsim 20.0.1 has darwin 11 builds
             || file.filename == "dbbsim-18.0.3-cp39-cp39-macosx_14_0_arm64.whl"
             || file.filename == "dsd_ctms_oper_res_speed_profiles-7.2.0-cp39-cp39-macosx_13_0_arm64.whl"
-            || (lib.any (self.isPlatformTagCompatible platform python.stdenv.cc.libc) file.platformTags);
+            # somethings wrong the marker evaluation so force these here:
+            || file.filename == "tensorflow_macos-2.9.0-cp39-cp39-macosx_11_0_arm64.whl"
+            || file.filename == "tensorflow_metal-0.4.0-cp39-cp39-macosx_11_0_arm64.whl"
+            || (lib.any (self.isPlatformTagCompatible platform python.stdenv.cc.libc) file.platformTags));
+            # || (lib.any (self.isPlatformTagCompatible (lib.debug.traceValSeq platform) python.stdenv.cc.libc) file.platformTags));
           in
           {
             bestLanguageTag = head (sort (x: y: x > y) languageTags');
