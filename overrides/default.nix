@@ -3309,9 +3309,18 @@ lib.composeManyExtensions [
         }
       );
 
+      # tensorflow-macos = super.tensorflow-macos.overridePythonAttrs (
+      #   _old: {
+      #     inherit (self.tensorflow) postInstall;
+      #   }
+      # );
+      # copy postInstall fix from normal tensorflow package to not reference it
+      # therefore require it. See https://github.com/nix-community/poetry2nix/issues/1609
       tensorflow-macos = super.tensorflow-macos.overridePythonAttrs (
         _old: {
-          inherit (self.tensorflow) postInstall;
+          postInstall = ''
+            rm $out/bin/tensorboard
+          '';
         }
       );
 
