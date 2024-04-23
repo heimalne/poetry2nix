@@ -212,6 +212,7 @@ lib.fix (self: {
     &&
     # Check version
     (
+      # checkTagVersion (lib.debug.traceValSeq sourceVersion) abiTag.version
       checkTagVersion sourceVersion abiTag.version
     );
 
@@ -293,6 +294,7 @@ lib.fix (self: {
     # Python tag
     pythonTag:
     let
+      # inherit (python.passthru) (lib.debug.traceValSeq sourceVersion) implementation;
       inherit (python.passthru) sourceVersion implementation;
     in
     (
@@ -356,15 +358,14 @@ lib.fix (self: {
 
             # Filter only compatible tags
             languageTags = filter (self.isPythonTagCompatible python) file.languageTags;
+            # languageTags = filter (self.isPythonTagCompatible (lib.debug.traceValSeq python)) file.languageTags;
             # Extract the tag as a number. E.g. "37" is `toInt "37"` and "none"/"any" is 0
             languageTags' = map (tag: if tag == "none" then 0 else toInt tag.version) languageTags;
             isPlatformOk = 
-            # this is wrongly selected by poetry (maybe bad metadata in the wheel?)
-             file.filename != "tensorflow_macos-2.9.0-cp38-cp38-macosx_11_0_arm64.whl"
-             &&
             #(lib.debug.traceValSeq file).filename == "scipy-1.13.0-cp39-cp39-macosx_12_0_arm64.whl" 
             # (lib.debug.traceValSeq file).filename == "scipy-1.13.0-cp311-cp311-macosx_12_0_arm64.whl" 
-            lib.debug.traceValSeqFn (isOk: "seelectWheels ${file.filename} platform ok? ${builtins.toString isOk}, abi ok? ${builtins.toString abiCompatible} tags: ${builtins.toString file.platformTags}") (
+            # lib.debug.traceValSeqFn (isOk: "seelectWheels ${file.filename} platform ok? ${builtins.toString isOk}, abi ok? ${builtins.toString abiCompatible} tags: ${builtins.toString file.platformTags}") (
+              (
               file.filename == "scipy-1.8.0-cp39-cp39-macosx_12_0_arm64.whl" 
             
             || file.filename == "scikit_image-0.22.0-cp39-cp39-macosx_12_0_arm64.whl"
@@ -402,6 +403,7 @@ lib.fix (self: {
     in
     # Strip away temporary sorting metadata
     map (file': file'.file) sorted
+    # lib.debug.traceValSeqFn (v: "best wheels ${builtins.toString (map (f: f.filename) v)}") (map (file': file'.file) sorted)
   ;
 
 })
