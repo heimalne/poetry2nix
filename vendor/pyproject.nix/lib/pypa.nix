@@ -362,6 +362,8 @@ lib.fix (self: {
             # Extract the tag as a number. E.g. "37" is `toInt "37"` and "none"/"any" is 0
             languageTags' = map (tag: if tag == "none" then 0 else toInt tag.version) languageTags;
             isPlatformOk = 
+            # hack to get wheels with >=12 version against darwinSdkVersion 11 (only supported one in Nixpkgs)
+            # to be accepted, since they work:
             #(lib.debug.traceValSeq file).filename == "scipy-1.13.0-cp39-cp39-macosx_12_0_arm64.whl" 
             # (lib.debug.traceValSeq file).filename == "scipy-1.13.0-cp311-cp311-macosx_12_0_arm64.whl" 
             # lib.debug.traceValSeqFn (isOk: "seelectWheels ${file.filename} platform ok? ${builtins.toString isOk}, abi ok? ${builtins.toString abiCompatible} tags: ${builtins.toString file.platformTags}") (
@@ -376,6 +378,8 @@ lib.fix (self: {
             # somethings wrong the marker evaluation so force these here:
             || file.filename == "tensorflow_macos-2.9.0-cp39-cp39-macosx_11_0_arm64.whl"
             || file.filename == "tensorflow_metal-0.4.0-cp39-cp39-macosx_11_0_arm64.whl"
+            || file.filename == "tensorflow-2.15.1-cp39-cp39-macosx_12_0_arm64.whl"
+            || file.filename == "tensorflow_io_gcs_filesystem-0.36.0-cp39-cp39-macosx_12_0_arm64.whl"
             || (lib.any (self.isPlatformTagCompatible platform python.stdenv.cc.libc) file.platformTags));
             # || (lib.any (self.isPlatformTagCompatible (lib.debug.traceValSeq platform) python.stdenv.cc.libc) file.platformTags));
           in
