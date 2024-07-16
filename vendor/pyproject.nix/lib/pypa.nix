@@ -375,6 +375,8 @@ lib.fix (self: {
             # dbbsim 20.0.1 has darwin 11 builds
             || file.filename == "dbbsim-18.0.3-cp39-cp39-macosx_14_0_arm64.whl"
             || file.filename == "dsd_ctms_oper_res_speed_profiles-8.0.2-cp39-cp39-macosx_13_0_arm64.whl"
+            || file.filename == "torch-2.0.1-cp39-none-macosx_11_0_arm64.whl"
+            || file.filename == "torch-1.10.1-cp39-none-macosx_11_0_arm64.whl"
             # somethings wrong the marker evaluation so force these here:
             || file.filename == "tensorflow_macos-2.9.0-cp39-cp39-macosx_11_0_arm64.whl"
             || file.filename == "tensorflow_metal-0.4.0-cp39-cp39-macosx_11_0_arm64.whl"
